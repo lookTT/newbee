@@ -1,6 +1,6 @@
 ---
 -- @module util
-local m = {123}
+local m = {}
 
 ---
 -- @function [parent=#util]
@@ -151,6 +151,29 @@ end
 -- @return #string
 m.jsonEncode = function (t)
     return json.encode(t)
+end
+
+---
+-- uri string 2 json string
+-- @function [parent=#util]
+-- @param #string str
+-- @return #string
+m.urlDecode = function (str)
+    --return CLF_DecodeURI(str)
+    local s = string.gsub(str, "+", " ")
+    s = string.gsub(s, '%%(%x%x)', function(h) return string.char(tonumber(h, 16)) end)
+    return s
+end
+---
+-- json string 2 uri string
+-- @function [parent=#util]
+-- @param #string str
+-- @return #string
+m.urlEncode = function (str)
+    --return CLF_EncodeURI(str)
+    local s = string.gsub(str, "([^%w%.%- ])", function(c) return string.format("%%%02X", string.byte(c)) end)
+    s = string.gsub(s, " ", "+")
+    return s
 end
 
 --仅用作串行化表示字符串使用后应清空该字串

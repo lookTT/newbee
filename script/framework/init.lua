@@ -2,7 +2,7 @@
 ---
 --@module init
 
-require("util")
+require("nb")
 
 require("ccf_interface")
 require("clf_interface")
