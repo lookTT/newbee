@@ -19,7 +19,7 @@
 
 #define NEWBEE_DEFAULT_PID_FILE "/var/run/server.pid"
 #define NEWBEE_DEFAULT_NULL_FILE "/dev/null"
-#define NEWBEE_DEFAULT_LUA_SCRIPT_FILE "scrip"
+#define NEWBEE_DEFAULT_LUA_SCRIPT_FILE "script"
 #define NEWBEE_DEFAULT_LUA_ENTRANCE "main"
 #define NEWBEE_DEFAULT_LUA_SUFFIX "lua"
 #define NEWBEE_DEFAULT_LUA_FRAMEWORK "framework/"
