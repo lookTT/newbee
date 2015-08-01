@@ -1,6 +1,7 @@
 #include "app.h"
 #include "config.h"
 #include "websockets.h"
+#include "httpserver.h"
 #include "lualogic.h"
 
 //  The minimum interval to execute a update function
@@ -23,7 +24,9 @@ bool CApp::init() {
     if (!g_pWebSocketsServer->Open(g_pConf->port)) {
         return false;
     }
-
+    if (!g_pHttpServer->Open(g_pConf->port_http)) {
+        return false;
+    }
     //
     if (!initLuaStack()) {
         return false;
@@ -36,8 +39,15 @@ void CApp::run() {
     //main loop
     while (!_isShutDown) {
         g_pWebSocketsServer->EventLoop();
+        g_pHttpServer->EventLoop();
 
-        sleep(1);
+        lua_settop(_pLua, 0);
+        lua_getglobal(_pLua, "CLF_Update");
+        if (0 != lua_pcall(_pLua, 0, 0, 0)) {
+            LOG(ERROR) << "Failed to call LUA function 'CLF_Update':" << lua_tostring(_pLua, -1);
+        }
+
+        usleep(1000);
     }
 
     // release all

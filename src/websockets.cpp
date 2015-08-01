@@ -107,11 +107,10 @@ static int callback_logic(struct libwebsocket_context *context, struct libwebsoc
             break;
         }
 
-        s_message_buffer* pSMessageBuffer = pSUserHandler->msg_buffer.front();
-        memcpy(&pss->buf[LWS_SEND_BUFFER_PRE_PADDING], pSMessageBuffer->buf, pSMessageBuffer->len);
-        pss->len = pSMessageBuffer->len;
+        s_message_buffer& pSMessageBuffer = pSUserHandler->msg_buffer.front();
+        memcpy(&pss->buf[LWS_SEND_BUFFER_PRE_PADDING], pSMessageBuffer.buf, pSMessageBuffer.len);
+        pss->len = pSMessageBuffer.len;
         pSUserHandler->msg_buffer.pop();
-        g_pWebSocketsServer->deallocate(pSMessageBuffer);
 
         //Send msg
         n = libwebsocket_write(wsi, &pss->buf[LWS_SEND_BUFFER_PRE_PADDING], pss->len, LWS_WRITE_TEXT);
@@ -148,11 +147,11 @@ static int callback_logic(struct libwebsocket_context *context, struct libwebsoc
         sprintf(str_uguid, "%llu", uguid);
 
         lua_settop(pLuaState, 0);
-        lua_getglobal(pLuaState, "CLF_DealWithClientLogic");
+        lua_getglobal(pLuaState, "CLF_DealWithWebsocketsLogic");
         lua_pushstring(pLuaState, str_uguid);
         lua_pushstring(pLuaState, data);
         if (0 != lua_pcall(pLuaState, 2, 0, 0)) {
-            LOG(ERROR) << "Failed to call LUA function 'CLF_DealWithClientLogic':" << lua_tostring(pLuaState, -1);
+            LOG(ERROR) << "Failed to call LUA function 'CLF_DealWithWebsocketsLogic':" << lua_tostring(pLuaState, -1);
         }
 
         break;
@@ -170,7 +169,7 @@ static int callback_logic(struct libwebsocket_context *context, struct libwebsoc
         lua_getglobal(pLuaState, "CLF_ClientDropped");
         lua_pushstring(pLuaState, str_uguid);
         if (0 != lua_pcall(pLuaState, 1, 0, 0)) {
-            LOG(ERROR) << "Failed to call LUA function 'CLF_ClientDisconnect':" << lua_tostring(pLuaState, -1);
+            LOG(ERROR) << "Failed to call LUA function 'CLF_ClientDropped':" << lua_tostring(pLuaState, -1);
         }
         g_pWebSocketsServer->DelUserHandler(uguid);
 

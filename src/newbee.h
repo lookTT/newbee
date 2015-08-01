@@ -29,7 +29,6 @@ typedef long long int int64;
 #include <sys/stat.h>
 
 #include "glog/logging.h"
-#include "MemoryPool.h"
 
 extern "C" {
 #include "luajit-2.0/lauxlib.h"

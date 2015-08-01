@@ -6,7 +6,6 @@
 #include "newbee.h"
 #include "libwebsockets.h"
 #include "app.h"
-#include "MemoryPool.h"
 
 #define MAX_DATA_SIZE (32*1024)
 
@@ -24,12 +23,17 @@ struct per_session_data {
 struct s_message_buffer {
     unsigned char buf[MAX_DATA_SIZE];
     unsigned int len;
+
+    s_message_buffer() {
+        memset(buf, 0, MAX_DATA_SIZE);
+        len = 0;
+    }
 };
 
 struct SUserHandler {
     struct per_session_data * userData;
     struct libwebsocket *wsi;
-    std::queue<s_message_buffer*> msg_buffer;
+    std::queue<s_message_buffer> msg_buffer;
 };
 
 class CWebSocketsServer {
@@ -74,14 +78,6 @@ public:
         return NULL;
     }
 
-    s_message_buffer* allocate(){
-        return m_pool.allocate();
-    }
-
-    void deallocate(s_message_buffer* p){
-        m_pool.deallocate(p);
-    }
-
 private:
     CWebSocketsServer();
 
@@ -90,7 +86,6 @@ private:
     struct libwebsocket_context *m_context;
 
     std::map<uint64, SUserHandler*> m_mapUserHandler;
-    MemoryPool<s_message_buffer> m_pool;
 };
 
 #define g_pWebSocketsServer      (CWebSocketsServer::Instance())

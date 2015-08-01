@@ -23,9 +23,9 @@ static int CCF_Send2Client(lua_State* pLuaState) {
     }
 
     uint32 len = strlen(json);
-    s_message_buffer* p = g_pWebSocketsServer->allocate();
-    memcpy(p->buf, json, len);
-    p->len = len;
+    s_message_buffer p;
+    memcpy(p.buf, json, len);
+    p.len = len;
     pSUserHandler->msg_buffer.push(p); // Direct call memory copy operation efficiency should be O(n)
 
     libwebsocket_callback_on_writable(context, pSUserHandler->wsi);
