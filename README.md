@@ -1,4 +1,4 @@
-# newbee
+Simple is beautiful, so newbee is a beautiful small program.
 
 What is newbee?
 --------------
