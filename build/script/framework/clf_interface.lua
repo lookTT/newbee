@@ -21,6 +21,7 @@ end
 ---
 --Client Dropped Callback
 CLF_ClientDropped = function (uguid)
+    m_interface.doSignoutCallback(uguid)
     m_interface.delClient(uguid)
 end
 
@@ -59,13 +60,13 @@ CLF_DealWithHttpLogic = function (str)
     local call = function()
         r_msg = f(json)
     end
+
     local clock = os.clock()
     xpcall(call, nb.trackback)
     clock = (os.clock()-clock) * 1000
     if clock > 5 then
         glog("CLF_DealWithHttpLogic::msgid[%s] elapsed time: %.5f\n", msgid, clock)
     end
-
     r_msg = r_msg or ""
     if type(r_msg) == "table" then
         r_msg = nb.jsonEncode(r_msg)
@@ -76,10 +77,10 @@ end
 
 local mark_time = 0
 CLF_Update = function ()
-	local curTime = os.time()
-	if curTime - mark_time < 1 then return end
-	mark_time = curTime
-	m_interface.update()
+    local curTime = os.time()
+    if curTime - mark_time < 1 then return end
+    mark_time = curTime
+    m_interface.update()
 end
 
 return m

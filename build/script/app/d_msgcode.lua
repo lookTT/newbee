@@ -3,7 +3,7 @@
 --@module d_msgcode
 local m = {
     --心跳信息
-    client_heart_beat = 0,
+    w_heartbeat = 0,
 
     --注册
     h_signup = 10000,

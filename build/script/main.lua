@@ -9,6 +9,7 @@ local main = function()
     collectgarbage("setstepmul", 5000)
 
     require("c_redis")
+    require("user.c_user")
     require("shishicai.c_shishicai")
 
     nb.glog("let's rock now!!!")

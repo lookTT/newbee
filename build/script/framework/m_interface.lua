@@ -64,12 +64,47 @@ end
 local update_bind_call_back = {}
 m.update = function ()
     for _, func in pairs(update_bind_call_back) do
-    	func()
+        func()
     end
 end
 m.registUpdateLogicCallBack = function (func)
     if type(func) ~= "function" then return end
     table.insert(update_bind_call_back, func)
 end
+
+
+--store the signin function list
+local t_user_signin = {}
+m.registUserSigninFunc = function (func)
+    if type(func) ~= "function" then return end
+    table.insert(t_user_signin, func)
+end
+m.doSigninCallback = function (uguid)
+    local uid = m.getUidByUguid(uguid)
+    if uid then
+        for _, func in pairs(t_user_signin) do
+            func(uguid, uid)
+        end
+    end
+end
+
+
+--store the signout function list
+local t_user_signout = {}
+m.registUserSignoutFunc = function (func)
+    if type(func) ~= "function" then return end
+    table.insert(t_user_signout, func)
+end
+m.doSignoutCallback = function (uguid)
+    local uid = m.getUidByUguid(uguid)
+    if uid then
+        for _, func in pairs(t_user_signout) do
+            func(uguid, uid)
+        end
+    end
+end
+
+
+
 
 return m

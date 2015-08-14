@@ -11,6 +11,7 @@ local registHttp = m_interface.registHttpLogicCallBack
 
 local nb = require("nb")
 local send = nb.send2client
+local back = nb.back2client
 
 
 m.websockets = function(uguid, t)
@@ -22,7 +23,7 @@ end
 
 m.http = function(t)
 
-    return t
+    return back(t)
 end
 
 local init = function ()

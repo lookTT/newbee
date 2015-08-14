@@ -61,10 +61,10 @@ end
 m.createObjID = function (platfromid, serverid)
     -- in C++ code: uint64 guid = ((platfromid)<<(8+32+16)) | ((serverid)<<(32 + 16)) | ((curTime)<<16) | ((seed)&0xffff);
     platfromid = tonumber(platfromid)
-    platfromid = platfromid or 0
+    platfromid = platfromid or 1
 
     serverid = tonumber(serverid)
-    serverid = serverid or 0
+    serverid = serverid or 1
 
     local guid = CCF_CreateObjID(platfromid, serverid)
 
@@ -184,13 +184,28 @@ m.send2client = function(uguid, json)
     end
 
     if type(json) ~= 'string' then
-        util.trackback(string.format("ccf_interface.ccf_Send2Client json type is [%s]", type(json)))
+        util.trackback(string.format("nb.send2client json type is [%s]", type(json)))
         return
     end
 
     CCF_Send2Client(uguid, json)
 end
 
+---
+--http信息返回，仅可做回复，不可做推送
+--@function [parent=#nb]
+m.back2client = function (json)
+    if type(json) == 'table' then
+        json = m.jsonEncode(json)
+    end
+
+    if type(json) ~= 'string' then
+        m.trackback(string.format("nb.back2client json type is [%s]", type(json)))
+        return
+    end
+
+    return json
+end
 
 ---
 --@function [parent=#nb]
