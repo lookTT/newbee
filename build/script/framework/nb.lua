@@ -4,6 +4,14 @@
 --@module nb
 local m = {}
 
+local string = string
+local type = type
+local os = os
+local io = io
+local print = print
+local tostring = tostring
+local tonumber = tonumber
+
 ---
 -- @function [parent=#nb]
 -- @param ...
@@ -184,7 +192,7 @@ m.send2client = function(uguid, json)
     end
 
     if type(json) ~= 'string' then
-        util.trackback(string.format("nb.send2client json type is [%s]", type(json)))
+        m.trackback(string.format("nb.send2client json type is [%s]", type(json)))
         return
     end
 
@@ -212,7 +220,5 @@ end
 m.md5 = function (str)
     return CCF_MD5(str)
 end
-
-
 
 return m

@@ -3,6 +3,10 @@
 --@module c_redis
 local m = {}
 
+local tonumber = tonumber
+local tostring = tostring
+local type = type
+
 local nb = require("nb")
 local glog = nb.glog
 
@@ -17,14 +21,58 @@ if redis:ping() then
 end
 
 local redis_db = {
+    --服务器配置信息
+    server = {
+        --db索引
+        db = 0,
+        --自增推广号
+        increase_spreadnum = "increase_spreadnum",
+    },
     --用户信息
-    user = 0,
+    user = {
+        --db索引
+        db = 1,
+        --玩家id
+        uid = 'uid',
+        --账号
+        account = 'account',
+        --密码
+        passwd = 'passwd',
+        --昵称
+        name= 'name',
+        --自身的推广号
+        spreadnum = 'spreadnum',
+        --注册时间
+        signup_time = 'signup_time',
+        --最近一次登录时间
+        signin_time = 'signin_time',
+        --银币
+        money = 'money',
+        --金币
+        gold = 'gold',
+        --钻石
+        diamond = 'diamond',
+    },
+    --account对应uid
+    account = {
+        db = 2,
+    },
+    --name对应uid
+    name = {
+        --db索引
+        db = 3,
+    },
 }
 
 --str:sha1
 local shafunc = {}
 ---将部分脚本提前导入到redis服务器内
-local evalsha = function (str, ...)
+local evalsha = function (str, numkeys, ...)
+    str = tostring(str)
+    numkeys = tonumber(numkeys)
+    if type(str) ~= 'string' or type(numkeys) ~= 'number' then
+        return
+    end
     --检查是否加载了该脚本
     local sha1 = shafunc[str]
     if not sha1 then
@@ -34,15 +82,42 @@ local evalsha = function (str, ...)
     end
 
     --执行脚本
-    redis:evalsha(sha1, 0, ...)
+    redis:evalsha(sha1, numkeys, ...)
+end
+
+---初始化redis服务器信息
+local init = function ()
+    redis:select(redis_db.server.db)
+    if not redis:exists(redis_db.server.increase_spreadnum) then
+        redis:set(redis_db.server.increase_spreadnum, 10000)
+    end
+end
+init()
+
+---
+--获取一个新的推广号
+m.new_spreadnum = function()
+    redis:select(redis_db.server.db)
+    return redis:incr(redis_db.server.increase_spreadnum)
 end
 
 ---
 --检测账号是否重复
 --@function [parent=#c_redis]
 m.check_account = function(account)
-    redis:select(redis_db.user)
+    redis:select(redis_db.account.db)
     if redis:exists(account) then
+        return true
+    end
+    return false
+end
+
+---
+--检测昵称是否重复
+--@function [parent=#c_redis]
+m.check_name = function(name)
+    redis:select(redis_db.name.db)
+    if redis:exists(name) then
         return true
     end
     return false
@@ -51,24 +126,48 @@ end
 ---
 --注册账号信息
 --@function [parent=#c_redis]
-m.signup = function (uid, account, passwd, name, spreadnum)
+m.signup = function (uid, account, passwd, name)
+    uid = tostring(uid)
+    account = tostring(account)
+    passwd = tostring(passwd)
+    name = tostring(name)
+
     local str = [[
-    redis.pcall('SELECT', ARGV[1])
-    redis.pcall('HSET', ARGV[2], 'uid', ARGV[2])
-    redis.pcall('HSET', ARGV[2], 'account', ARGV[3])
-    redis.pcall('HSET', ARGV[2], 'passwd', ARGV[4])
-    redis.pcall('HSET', ARGV[2], 'name', ARGV[5])
-    redis.pcall('HSET', ARGV[2], 'spreadnum', ARGV[6])
+    redis.pcall('SELECT', ARGV[#ARGV])
+    for i= 1, 5 do
+        redis.pcall('HSET', ARGV[1], KEYS[i], ARGV[i])
+    end
     return redis.pcall("HGETALL", ARGV[2])
 ]]
 
+    local info = redis_db.user
     evalsha(str,
-        redis_db.user,--1
-        uid,
+        5,
+
+        info.uid, --1
+        info.account,
+        info.passwd,
+        info.name,
+        info.spreadnum,
+        info.signup_time,
+        info.signin_time,
+
+        uid, --1
         account,
         passwd,
         name,
-        spreadnum)
+        m.new_spreadnum(),
+        os.time(),
+        0,
+
+        info.db)
+
+    --记录account与uid对应关系
+    redis:select(redis_db.account.db)
+    redis:set(account, uid)
+    --记录name与uid对应关系
+    redis:select(redis_db.name.db)
+    redis:set(name, uid)
 end
 
 return m

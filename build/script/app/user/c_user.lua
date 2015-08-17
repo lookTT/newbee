@@ -47,6 +47,11 @@ m.signup = function (msg)
         rmsg.errorid = 1;
         return back(rmsg)
     end
+    --检测昵称是否重复
+    if c_redis.check_name(name) then
+        rmsg.errorid = 2;
+        return back(rmsg)
+    end
 
     --创建全服唯一ID
     local uid = nb.createObjID()
