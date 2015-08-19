@@ -221,4 +221,11 @@ m.md5 = function (str)
     return CCF_MD5(str)
 end
 
+m.uuidgen = function ()
+    local file = io.popen('uuidgen')
+    local uuid = file:read("*a")
+    file:close()
+    return m.md5(uuid)
+end
+
 return m

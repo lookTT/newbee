@@ -23,44 +23,50 @@ end
 local redis_db = {
     --服务器配置信息
     server = {
-        --db索引
         db = 0,
-        --自增推广号
-        increase_spreadnum = "increase_spreadnum",
+        key = {
+            --自增推广号
+            increase_spreadnum = "increase_spreadnum",
+        },
+    },
+    --sesson对应uid
+    session = {
+        db = 1,
     },
     --用户信息
     user = {
-        --db索引
-        db = 1,
-        --玩家id
-        uid = 'uid',
-        --账号
-        account = 'account',
-        --密码
-        passwd = 'passwd',
-        --昵称
-        name= 'name',
-        --自身的推广号
-        spreadnum = 'spreadnum',
-        --注册时间
-        signup_time = 'signup_time',
-        --最近一次登录时间
-        signin_time = 'signin_time',
-        --银币
-        money = 'money',
-        --金币
-        gold = 'gold',
-        --钻石
-        diamond = 'diamond',
+        db = 2,
+        key = {
+            --玩家id
+            uid = 'uid',
+            --账号
+            account = 'account',
+            --密码
+            passwd = 'passwd',
+            --昵称
+            name= 'name',
+            --自身的推广号
+            spreadnum = 'spreadnum',
+            --注册时间
+            signup_time = 'signup_time',
+            --最近一次登录时间
+            signin_time = 'signin_time',
+            --银币
+            money = 'money',
+            --金币
+            gold = 'gold',
+            --钻石
+            diamond = 'diamond',
+        },
+
     },
     --account对应uid
     account = {
-        db = 2,
+        db = 3,
     },
     --name对应uid
     name = {
-        --db索引
-        db = 3,
+        db = 4,
     },
 }
 
@@ -88,8 +94,8 @@ end
 ---初始化redis服务器信息
 local init = function ()
     redis:select(redis_db.server.db)
-    if not redis:exists(redis_db.server.increase_spreadnum) then
-        redis:set(redis_db.server.increase_spreadnum, 10000)
+    if not redis:exists(redis_db.server.key.increase_spreadnum) then
+        redis:set(redis_db.server.key.increase_spreadnum, 10000)
     end
 end
 init()
@@ -98,7 +104,7 @@ init()
 --获取一个新的推广号
 m.new_spreadnum = function()
     redis:select(redis_db.server.db)
-    return redis:incr(redis_db.server.increase_spreadnum)
+    return redis:incr(redis_db.server.key.increase_spreadnum)
 end
 
 ---
@@ -140,7 +146,7 @@ m.signup = function (uid, account, passwd, name)
     return redis.pcall("HGETALL", ARGV[2])
 ]]
 
-    local info = redis_db.user
+    local info = redis_db.user.key
     evalsha(str,
         5,
 
@@ -148,17 +154,23 @@ m.signup = function (uid, account, passwd, name)
         info.account,
         info.passwd,
         info.name,
-        info.spreadnum,
+        info.spreadnum,--5
         info.signup_time,
         info.signin_time,
+        info.money,
+        info.gold,
+        info.diamond,--10
 
         uid, --1
         account,
         passwd,
         name,
-        m.new_spreadnum(),
+        m.new_spreadnum(),--5
         os.time(),
         0,
+        0,
+        0,
+        0,--10
 
         info.db)
 
