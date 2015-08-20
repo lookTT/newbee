@@ -221,9 +221,10 @@ m.md5 = function (str)
     return CCF_MD5(str)
 end
 
+---
+--@function [parent=#nb]
 m.uuidgen = function ()
-    local uuid = os.execute('uuidgen')
-    return m.md5(uuid)
+    return os.execute('uuidgen')
 end
 
 return m
