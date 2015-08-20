@@ -222,9 +222,7 @@ m.md5 = function (str)
 end
 
 m.uuidgen = function ()
-    local file = io.popen('uuidgen')
-    local uuid = file:read("*a")
-    file:close()
+    local uuid = os.execute('uuidgen')
     return m.md5(uuid)
 end
 
