@@ -221,10 +221,11 @@ m.md5 = function (str)
     return CCF_MD5(str)
 end
 
+local uuid = require("uuid")
 ---
 --@function [parent=#nb]
 m.uuidgen = function ()
-    return os.execute('uuidgen')
+    return m.md5(uuid.generate())
 end
 
 return m
