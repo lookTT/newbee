@@ -33,7 +33,7 @@ end
 ---
 --注册
 --@function [parent=#user.c_user]
-m.signup = function (msg)
+m.signup = function (uid, msg)
     local account = msg.account
     local passwd = msg.passwd
     local name = msg.name
@@ -53,8 +53,8 @@ m.signup = function (msg)
         return back(rmsg)
     end
 
-    --创建全服唯一ID
-    local uid = nb.createObjID()
+    --创建uuid
+    local uid = nb.uuidgen()
     --进行注册
     c_redis.signup(uid, account,passwd,name,spreadnum)
 
@@ -64,13 +64,21 @@ end
 ---
 --登陆
 --@function [parent=#user.c_user]
-m.signin = function (msg)
+m.signin = function (uid, msg)
+    local account = msg.account
+    local passwd = msg.passwd
+
+    local rmsg = {}
+    rmsg.errorid = 0
+    --登录
+    local userinfo = c_redis.signin(account,passwd)
+
 end
 
 ---
 --登出
 --@function [parent=#user.c_user]
-m.signout = function (msg)
+m.signout = function (uid, msg)
 
 end
 

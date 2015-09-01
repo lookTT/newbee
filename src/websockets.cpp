@@ -70,7 +70,6 @@ static int callback_logic(struct libwebsocket_context *context, struct libwebsoc
 
     switch (reason) {
     case LWS_CALLBACK_ESTABLISHED: {
-        LOG(ERROR) << "LWS_CALLBACK_ESTABLISHED";
         //init the data
         memset(pss, 0, sizeof(pss));
         g_pWebSocketsServer->AddUserHandler(uguid, pss, wsi);
@@ -158,9 +157,6 @@ static int callback_logic(struct libwebsocket_context *context, struct libwebsoc
     }
 
     case LWS_CALLBACK_CLOSED: {
-
-        LOG(ERROR) << "LWS_CALLBACK_CLOSED";
-
         char str_uguid[64];
         memset(str_uguid, 0, sizeof(str_uguid));
         sprintf(str_uguid, "%llu", uguid);

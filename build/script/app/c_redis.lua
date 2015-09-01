@@ -29,13 +29,9 @@ local redis_db = {
             increase_spreadnum = "increase_spreadnum",
         },
     },
-    --sesson对应uid
-    session = {
-        db = 1,
-    },
     --用户信息
     user = {
-        db = 2,
+        db = 1,
         key = {
             --玩家id
             uid = 'uid',
@@ -59,6 +55,10 @@ local redis_db = {
             diamond = 'diamond',
         },
 
+    },
+    --sesson对应uid
+    session = {
+        db = 2,
     },
     --account对应uid
     account = {
@@ -140,7 +140,7 @@ m.signup = function (uid, account, passwd, name)
 
     local str = [[
     redis.pcall('SELECT', ARGV[#ARGV])
-    for i= 1, 5 do
+    for i= 1, #KEYS do
         redis.pcall('HSET', ARGV[1], KEYS[i], ARGV[i])
     end
     return redis.pcall("HGETALL", ARGV[2])
@@ -148,7 +148,7 @@ m.signup = function (uid, account, passwd, name)
 
     local info = redis_db.user.key
     evalsha(str,
-        5,
+        10,
 
         info.uid, --1
         info.account,
@@ -172,7 +172,7 @@ m.signup = function (uid, account, passwd, name)
         0,
         0,--10
 
-        info.db)
+        redis_db.user.db)
 
     --记录account与uid对应关系
     redis:select(redis_db.account.db)
@@ -180,6 +180,29 @@ m.signup = function (uid, account, passwd, name)
     --记录name与uid对应关系
     redis:select(redis_db.name.db)
     redis:set(name, uid)
+end
+
+---
+--登录
+--@function [parent=#c_redis]
+m.signin = function(account,passwd)
+    redis:select(redis_db.account.db)
+    local uid = redis:get(account)
+    if uid == nil or uid == "" then
+        return nil
+    end
+
+    redis:select(redis_db.user.db)
+    local a = redis:hgetall()
+    glog(type(a))
+end
+
+---
+--获取session
+--@function [parent=#c_redis]
+m.get_uid_by_session = function (session)
+    redis:select(redis_db.session.db)
+    return redis:get(session)
 end
 
 return m

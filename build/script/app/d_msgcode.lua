@@ -4,6 +4,8 @@
 local m = {
     --心跳信息
     w_heartbeat = 0,
+    --获取session
+    h_get_session = 1,
 
     --注册
     h_signup = 10000,
@@ -16,7 +18,7 @@ local m = {
 
     --获取个人信息
     h_get_self_info = 10100,
-    --货币变化
+    --通知货币变化
     w_money_chage = 10101,
 
     --进入时时彩

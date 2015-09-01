@@ -7,6 +7,7 @@ local nb = require("nb")
 local glog = nb.glog
 
 local m_interface = require("m_interface")
+local c_redis = require("c_redis")
 
 ---
 -- Client connections to the server via websockets agreement
@@ -47,18 +48,18 @@ CLF_DealWithWebsocketsLogic = function (uguid, json)
     end
 end
 
-
 CLF_DealWithHttpLogic = function (str)
     local json = nb.jsonDecode(str)
     local r_msg = nil
     if type(json) ~= "table" then return "1" end
     if type(json.msgid) == "nil" then return "2" end
     local msgid = tonumber(json.msgid)
+    local uid = c_redis.get_uid_by_session(tostring(json.session))
 
     local f = m_interface.getHttpLogicCallBack(msgid)
     if type(f) ~= "function" then return "3" end
     local call = function()
-        r_msg = f(json)
+        r_msg = f(uid, json)
     end
 
     local clock = os.clock()
@@ -69,6 +70,9 @@ CLF_DealWithHttpLogic = function (str)
     end
     r_msg = r_msg or ""
     if type(r_msg) == "table" then
+        if uid == nil or uid == "nil" then
+            r_msg.session = nb.uuidgen()
+        end
         r_msg = nb.jsonEncode(r_msg)
     end
 
