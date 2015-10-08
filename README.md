@@ -10,7 +10,7 @@ newbee使用了C++和lua进行开发，希望大家喜欢。
 
 (libevent, libwebsokets, luajit, luarocks, lua-cjson, luasocket, luasql-mysql, redis-lua)
 
-增加了一个简单的setup.sh的shell脚本来安装这些必要的依赖库，都是默认安装，编写时使用的操作系统是CentOS6.7，理论上是支持所有Red Hat AS系列
+增加了一个简单的setup.sh的shell脚本来安装这些必要的依赖库，都是默认安装，编写时使用的操作系统是CentOS 6.7，理论上是支持所有Linux like的操作系统，建议在CentOS 6.x上做开发部署
 
 构建newbee
 --------------
