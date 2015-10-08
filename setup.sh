@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Preparing to install gcc and g++"
-yum install -y gcc gcc-c++
+yum install gcc-c++ libstdc++-devel
 
 echo "Preparing to install libuuid-devel"
 yum install -y libuuid-devel
