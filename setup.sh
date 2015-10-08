@@ -12,14 +12,23 @@ yum install -y mysql-devel
 echo "Preparing to install lua-devel"
 yum install -y lua-devel
 
-echo "Preparing to install libevent"
-yum install -y libevent-devel
-
 echo "Preparing to install CMake"
 yum install -y cmake
 
 echo "Preparing to install openssl-devel"
 yum install -y openssl-devel
+
+echo "Preparing to install libevent"
+cd /tmp
+wget http://superb-dca2.dl.sourceforge.net/project/levent/libevent/libevent-2.0/libevent-2.0.22-stable.tar.gz
+tar zxvf libevent-2.0.22-stable.tar.gz
+cd libevent-2.0.22-stable
+./configure
+make
+make install
+cd /tmp
+rm -fr libevent-2.0.22-stable.tar.gz
+rm -fr libevent-2.0.22-stable
 
 echo "Preparing to install glog"
 cd /tmp
@@ -76,16 +85,16 @@ cd /tmp
 rm -fr libwebsockets-master.zip
 rm -fr libwebsockets-master
 
-#echo "Preparing to install redis"
-#cd /tmp
-#wget http://download.redis.io/releases/redis-3.0.4.tar.gz
-#tar zxvf redis-3.0.4.tar.gz
-#cd redis-3.0.4
-#make
-#make install
-#cd /tmp
-#rm -fr redis-3.0.4.tar.gz
-#rm -fr redis-3.0.4
+echo "Preparing to install redis"
+cd /tmp
+wget http://download.redis.io/releases/redis-3.0.4.tar.gz
+tar zxvf redis-3.0.4.tar.gz
+cd redis-3.0.4
+make
+make install
+cd /tmp
+rm -fr redis-3.0.4.tar.gz
+rm -fr redis-3.0.4
 
 echo "Setting ldconfig"
 echo /usr/local/lib > /etc/ld.so.conf.d/mylib.conf
