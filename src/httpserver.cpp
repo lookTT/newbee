@@ -56,17 +56,15 @@ void CHttpServer::HttpHandler(struct evhttp_request* pReq, void* arg) {
     evhttp_parse_query(pDecodeUri, &sHttpQuery);
     free(pDecodeUri);
 
-    /// Get the parameters from GET Form
-    //const char* time = evhttp_find_header(&sHttpQuery, "t");
-
+    int errorid = 0;
 
     lua_State* pluaState = g_pApp->getLuaState();
-    if (NULL == pluaState)
-        return;
-
     const char* json = evhttp_find_header(&sHttpQuery, "json");
+    if (NULL == pluaState or NULL == json) {
+        evhttp_clear_headers(&sHttpQuery);
+        return;
+    }
 
-    int errorid = 0;
     lua_settop(pluaState, 0);
     lua_getglobal(pluaState, "CLF_DealWithHttpLogic");
     lua_pushstring(pluaState, json);
@@ -79,20 +77,18 @@ void CHttpServer::HttpHandler(struct evhttp_request* pReq, void* arg) {
         LOG(ERROR) << "CHttpServer::HttpHandler::CLF_DealWithHttpLogic get the lua return value type error";
         errorid = 2;
     }
-    const char* r_json = errorid == 0 ? lua_tostring(pluaState, 1) : "0";
 
+    const char* r_json = errorid == 0 ? lua_tostring(pluaState, 1) : "0";
     //Initialization returned to the client data cache
     struct evbuffer* pEvBuf = evbuffer_new();
     //Processing output header header
     evhttp_add_header(pReq->output_headers, "Content-Type", "text/plain");
     evhttp_add_header(pReq->output_headers, "Connection", "keep-alive");
     evhttp_add_header(pReq->output_headers, "Cache-Control", "no-cache");
-
     //Here is the output data to be displayed
     evbuffer_add_printf(pEvBuf, r_json);
-    //Return code 200
+    //Return code
     evhttp_send_reply(pReq, HTTP_OK, "OK", pEvBuf);
-
     //Release memory
     evhttp_clear_headers(&sHttpQuery);
     evbuffer_free(pEvBuf);

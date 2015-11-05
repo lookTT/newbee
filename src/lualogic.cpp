@@ -96,10 +96,16 @@ static int CCF_MD5(lua_State* pLuaState) {
     return 1;
 }
 
+static int CCF_CloseServer(lua_State* pLuaState) {
+    g_pApp->close();
+    return 0;
+}
+
 extern void lua_openServerLogic(lua_State* pLuaState) {
     lua_register(pLuaState, "CCF_Send2Client", CCF_Send2Client);
 
     lua_register(pLuaState, "CCF_CreateObjID", CCF_CreateObjID);
     lua_register(pLuaState, "CCF_GLOG", CCF_GLOG);
     lua_register(pLuaState, "CCF_MD5", CCF_MD5);
+    lua_register(pLuaState, "CCF_CloseServer", CCF_CloseServer);
 }

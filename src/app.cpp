@@ -63,7 +63,6 @@ void CApp::addSearchPath(const char* path) {
     lua_getglobal(_pLua, "package");
     lua_getfield(_pLua, -1, "path");
     const char* cur_path = lua_tostring(_pLua, -1);
-    //lua_pushfstring(_pLua, "%s;%s?.%s", cur_path, g_pConf->lua_script_path, g_pConf->lua_suffix);
     lua_pushfstring(_pLua, "%s;%s?.%s", cur_path, path, g_pConf->lua_suffix);
     lua_setfield(_pLua, -3, "path");
     lua_pop(_pLua, -2);
