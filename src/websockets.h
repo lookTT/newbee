@@ -15,7 +15,6 @@
 struct per_session_data {
     unsigned char buf[LWS_SEND_BUFFER_PRE_PADDING + MAX_DATA_SIZE + LWS_SEND_BUFFER_POST_PADDING];
     unsigned int len;
-    unsigned int index;
     bool isKickOff;
 };
 
@@ -76,6 +75,10 @@ public:
             return iter->second;
         }
         return NULL;
+    }
+
+    std::map<uint64, SUserHandler*>& GetAllUserHandler() {
+        return m_mapUserHandler;
     }
 
 private:

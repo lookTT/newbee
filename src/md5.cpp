@@ -46,23 +46,19 @@ inline MD5::uint32 MD5::rotate_left(uint32 x, int n) {
 
 // FF, GG, HH, and II transformations for rounds 1, 2, 3, and 4.
 // Rotation is separate from addition to prevent recomputation.
-inline void MD5::FF(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s,
-        uint32 ac) {
+inline void MD5::FF(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac) {
     a = rotate_left(a + F(b, c, d) + x + ac, s) + b;
 }
 
-inline void MD5::GG(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s,
-        uint32 ac) {
+inline void MD5::GG(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac) {
     a = rotate_left(a + G(b, c, d) + x + ac, s) + b;
 }
 
-inline void MD5::HH(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s,
-        uint32 ac) {
+inline void MD5::HH(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac) {
     a = rotate_left(a + H(b, c, d) + x + ac, s) + b;
 }
 
-inline void MD5::II(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s,
-        uint32 ac) {
+inline void MD5::II(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac) {
     a = rotate_left(a + I(b, c, d) + x + ac, s) + b;
 }
 
@@ -102,9 +98,7 @@ void MD5::init() {
 // decodes input (unsigned char) into output (uint4). Assumes len is a multiple of 4.
 void MD5::decode(uint32 output[], const uint8 input[], size_type len) {
     for (unsigned int i = 0, j = 0; j < len; i++, j += 4)
-        output[i] = ((uint32) input[j]) | (((uint32) input[j + 1]) << 8)
-                | (((uint32) input[j + 2]) << 16)
-                | (((uint32) input[j + 3]) << 24);
+        output[i] = ((uint32) input[j]) | (((uint32) input[j + 1]) << 8) | (((uint32) input[j + 2]) << 16) | (((uint32) input[j + 3]) << 24);
 }
 
 //////////////////////////////
@@ -256,10 +250,7 @@ void MD5::update(const char input[], size_type length) {
 // MD5 finalization. Ends an MD5 message-digest operation, writing the
 // the message digest and zeroizing the context.
 MD5& MD5::finalize() {
-    static unsigned char padding[64] = { 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0 };
+    static unsigned char padding[64] = { 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     if (!finalized) {
         // Save number of bits

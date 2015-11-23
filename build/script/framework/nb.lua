@@ -223,9 +223,25 @@ end
 
 local uuid = require("uuid")
 ---
+--获取一个MD5 之后的uuid
 --@function [parent=#nb]
 m.uuidgen = function ()
     return m.md5(uuid.generate())
+end
+
+
+---
+--将某个玩家从服务器中踢出
+--@function [parent=#nb]
+m.kickOffUser = function (uguid)
+    CCF_KickOffUser(uguid)
+end
+
+---
+--全服广播消息
+--@function [parent=#nb]
+m.send2broadcast = function (json)
+    CCF_Broadcast(json)
 end
 
 return m

@@ -1,3 +1,5 @@
+--如果不需要debugger注释掉即可
+require("debugger")("192.168.1.95", "10000", "luaidekey")
 --Initialization necessary information
 local nb = require("nb")
 require("init")
@@ -11,4 +13,3 @@ local main = function()
 end
 
 xpcall(main,nb.trackback)
-

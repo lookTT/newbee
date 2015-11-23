@@ -69,114 +69,114 @@ static int callback_logic(struct libwebsocket_context *context, struct libwebsoc
     lua_State* pLuaState = g_pApp->getLuaState();
 
     switch (reason) {
-    case LWS_CALLBACK_ESTABLISHED: {
-        //init the data
-        memset(pss, 0, sizeof(pss));
-        g_pWebSocketsServer->AddUserHandler(uguid, pss, wsi);
-        char ip[32];
-        libwebsockets_get_peer_addresses(context, wsi, libwebsocket_get_socket_fd(wsi), peer_name, sizeof(peer_name), ip, sizeof(ip));
+        case LWS_CALLBACK_ESTABLISHED: {
+            //init the data
+            memset(pss, 0, sizeof(pss));
+            g_pWebSocketsServer->AddUserHandler(uguid, pss, wsi);
+            char ip[32];
+            libwebsockets_get_peer_addresses(context, wsi, libwebsocket_get_socket_fd(wsi), peer_name, sizeof(peer_name), ip, sizeof(ip));
 
-        char str_uguid[64];
-        memset(str_uguid, 0, sizeof(str_uguid));
-        sprintf(str_uguid, "%llu", uguid);
+            char str_uguid[64];
+            memset(str_uguid, 0, sizeof(str_uguid));
+            sprintf(str_uguid, "%llu", uguid);
 
-        lua_settop(pLuaState, 0);
-        lua_getglobal(pLuaState, "CLF_ClientConnect");
-        lua_pushstring(pLuaState, str_uguid);
-        lua_pushstring(pLuaState, ip);
-        if (0 != lua_pcall(pLuaState, 2, 0, 0)) {
-            LOG(ERROR) << "Failed to call LUA function 'CLF_ClientConnect':" << lua_tostring(pLuaState, -1);
+            lua_settop(pLuaState, 0);
+            lua_getglobal(pLuaState, "CLF_ClientConnect");
+            lua_pushstring(pLuaState, str_uguid);
+            lua_pushstring(pLuaState, ip);
+            if (0 != lua_pcall(pLuaState, 2, 0, 0)) {
+                LOG(ERROR) << "Failed to call LUA function 'CLF_ClientConnect':" << lua_tostring(pLuaState, -1);
+            }
+            break;
         }
-        break;
-    }
-        /* when the callback is used for server operations --> */
-    case LWS_CALLBACK_SERVER_WRITEABLE: {
+            /* when the callback is used for server operations --> */
+        case LWS_CALLBACK_SERVER_WRITEABLE: {
 
-        //Forces the user offline
-        if (pss->isKickOff) {
-            return -1;
-        }
+            //Forces the user offline
+            if (pss->isKickOff) {
+                return -1;
+            }
 
-        SUserHandler* pSUserHandler = g_pWebSocketsServer->GetUserHandler(uguid);
-        if (NULL == pSUserHandler || NULL == context) {
-            return -1;
-        }
+            SUserHandler* pSUserHandler = g_pWebSocketsServer->GetUserHandler(uguid);
+            if (NULL == pSUserHandler || NULL == context) {
+                return -1;
+            }
 
-        if (pSUserHandler->msg_buffer.size() == 0) {
+            if (pSUserHandler->msg_buffer.size() == 0) {
+                break;
+            }
+
+            s_message_buffer& pSMessageBuffer = pSUserHandler->msg_buffer.front();
+            memcpy(&pss->buf[LWS_SEND_BUFFER_PRE_PADDING], pSMessageBuffer.buf, pSMessageBuffer.len);
+            pss->len = pSMessageBuffer.len;
+            pSUserHandler->msg_buffer.pop();
+
+            //Send msg
+            n = libwebsocket_write(wsi, &pss->buf[LWS_SEND_BUFFER_PRE_PADDING], pss->len, LWS_WRITE_TEXT);
+            if (n < 0) {
+                lwsl_err("ERROR %d writing to socket, hanging up\n", n);
+                return 1;
+            }
+            if (n < (int) pss->len) {
+                lwsl_err("Partial write\n");
+                for (uint32 i = 0; i < pSUserHandler->msg_buffer.size(); ++i) {
+                    pSUserHandler->msg_buffer.pop();
+                }
+                return -1;
+            }
+
+            if (pSUserHandler->msg_buffer.size() != 0) {
+                libwebsocket_callback_on_writable(context, pSUserHandler->wsi);
+            }
+
             break;
         }
 
-        s_message_buffer& pSMessageBuffer = pSUserHandler->msg_buffer.front();
-        memcpy(&pss->buf[LWS_SEND_BUFFER_PRE_PADDING], pSMessageBuffer.buf, pSMessageBuffer.len);
-        pss->len = pSMessageBuffer.len;
-        pSUserHandler->msg_buffer.pop();
-
-        //Send msg
-        n = libwebsocket_write(wsi, &pss->buf[LWS_SEND_BUFFER_PRE_PADDING], pss->len, LWS_WRITE_TEXT);
-        if (n < 0) {
-            lwsl_err("ERROR %d writing to socket, hanging up\n", n);
-            return 1;
-        }
-        if (n < (int) pss->len) {
-            lwsl_err("Partial write\n");
-            for (uint32 i = 0; i < pSUserHandler->msg_buffer.size(); ++i) {
-                pSUserHandler->msg_buffer.pop();
+        case LWS_CALLBACK_RECEIVE: {
+            if (len > MAX_DATA_SIZE) {
+                lwsl_err("Server received packet bigger than %u, hanging up\n", MAX_DATA_SIZE);
+                return 1;
             }
-            return -1;
+            char data[MAX_DATA_SIZE];
+            memset(data, 0, sizeof(data));
+            memcpy(data, in, len);
+
+            char str_uguid[64];
+            memset(str_uguid, 0, sizeof(str_uguid));
+            sprintf(str_uguid, "%llu", uguid);
+
+            lua_settop(pLuaState, 0);
+            lua_getglobal(pLuaState, "CLF_DealWithWebsocketsLogic");
+            lua_pushstring(pLuaState, str_uguid);
+            lua_pushstring(pLuaState, data);
+            if (0 != lua_pcall(pLuaState, 2, 0, 0)) {
+                LOG(ERROR) << "Failed to call LUA function 'CLF_DealWithWebsocketsLogic':" << lua_tostring(pLuaState, -1);
+            }
+
+            break;
         }
 
-        if (pSUserHandler->msg_buffer.size() != 0) {
-            libwebsocket_callback_on_writable(context, pSUserHandler->wsi);
+        case LWS_CALLBACK_CLOSED: {
+            char str_uguid[64];
+            memset(str_uguid, 0, sizeof(str_uguid));
+            sprintf(str_uguid, "%llu", uguid);
+
+            lua_settop(pLuaState, 0);
+            lua_getglobal(pLuaState, "CLF_ClientDropped");
+            lua_pushstring(pLuaState, str_uguid);
+            if (0 != lua_pcall(pLuaState, 1, 0, 0)) {
+                LOG(ERROR) << "Failed to call LUA function 'CLF_ClientDropped':" << lua_tostring(pLuaState, -1);
+            }
+            g_pWebSocketsServer->DelUserHandler(uguid);
+
+            break;
         }
 
-        break;
-    }
+        case LWS_CALLBACK_WSI_DESTROY:
+            break;
 
-    case LWS_CALLBACK_RECEIVE: {
-        if (len > MAX_DATA_SIZE) {
-            lwsl_err("Server received packet bigger than %u, hanging up\n", MAX_DATA_SIZE);
-            return 1;
-        }
-        char data[MAX_DATA_SIZE];
-        memset(data, 0, sizeof(data));
-        memcpy(data, in, len);
-
-        char str_uguid[64];
-        memset(str_uguid, 0, sizeof(str_uguid));
-        sprintf(str_uguid, "%llu", uguid);
-
-        lua_settop(pLuaState, 0);
-        lua_getglobal(pLuaState, "CLF_DealWithWebsocketsLogic");
-        lua_pushstring(pLuaState, str_uguid);
-        lua_pushstring(pLuaState, data);
-        if (0 != lua_pcall(pLuaState, 2, 0, 0)) {
-            LOG(ERROR) << "Failed to call LUA function 'CLF_DealWithWebsocketsLogic':" << lua_tostring(pLuaState, -1);
-        }
-
-        break;
-    }
-
-    case LWS_CALLBACK_CLOSED: {
-        char str_uguid[64];
-        memset(str_uguid, 0, sizeof(str_uguid));
-        sprintf(str_uguid, "%llu", uguid);
-
-        lua_settop(pLuaState, 0);
-        lua_getglobal(pLuaState, "CLF_ClientDropped");
-        lua_pushstring(pLuaState, str_uguid);
-        if (0 != lua_pcall(pLuaState, 1, 0, 0)) {
-            LOG(ERROR) << "Failed to call LUA function 'CLF_ClientDropped':" << lua_tostring(pLuaState, -1);
-        }
-        g_pWebSocketsServer->DelUserHandler(uguid);
-
-        break;
-    }
-
-    case LWS_CALLBACK_WSI_DESTROY:
-        break;
-
-    default:
-        break;
+        default:
+            break;
     }
 
     return 0;
