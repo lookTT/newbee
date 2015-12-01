@@ -22,6 +22,10 @@ Simple as:
 
 对应cocos2dx 例子
 --------------
+
+例子中的"abc"是对应websockets.cpp文件中protocols来写的例子，在实际的环境下为了协议安全建议大家写一个31字长以下的字符串。
+至于为什么是31位大家可以自己试更大的长度，也可以看看warmcat/libwebsockets的实现。
+
 lua:
 
     websocket = cc.WebSocket:createByAProtocol("127.0.0.1:8080", "abc")
@@ -36,7 +40,7 @@ lua:
 js:
 
     var WebSocket = WebSocket || window.WebSocket || window.MozWebSocket;
-    var _wsiSendText = new WebSocket("ws://127.0.0.1:8080", "8080");
+    var _wsiSendText = new WebSocket("ws://127.0.0.1:8080", "abc");
     //连接成功
     _wsiSendText.onopen = function (evt) {
         cc.log("_wsiSendText onopen");
