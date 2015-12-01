@@ -20,6 +20,44 @@ Simple as:
     $ cd build
     $ make
 
+对应cocos2dx 例子
+--------------
+lua:
+
+    websocket = cc.WebSocket:createByAProtocol("127.0.0.1:8080", "abc")
+    if nil ~= websocket then
+        websocket:registerScriptHandler(websocket_open,cc.WEBSOCKET_OPEN)
+        websocket:registerScriptHandler(websocket_message,cc.WEBSOCKET_MESSAGE)
+        websocket:registerScriptHandler(websocket_close,cc.WEBSOCKET_CLOSE)
+        websocket:registerScriptHandler(websocket_error,cc.WEBSOCKET_ERROR)
+    end
+ 
+ 
+js:
+    var WebSocket = WebSocket || window.WebSocket || window.MozWebSocket;
+    var _wsiSendText = new WebSocket("ws://127.0.0.1:8080", "8080");
+    //连接成功
+    _wsiSendText.onopen = function (evt) {
+        cc.log("_wsiSendText onopen");
+    };
+    
+    //收到信息
+    _wsiSendText.onmessage = function (evt) {
+        cc.log("response text msg: " + evt.data);
+    };
+
+    //连接错误
+    _wsiSendText.onerror = function (evt) {
+        cc.log("sendText Error was fired");
+    };
+
+    //连接关闭
+    _wsiSendText.onclose = function (evt) {
+        cc.log("_wsiSendText websocket instance closed.");
+    };
+
+
+
 联系我
 --------------
 Email:zltdhr@gmail.com
