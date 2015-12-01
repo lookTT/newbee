@@ -7,9 +7,9 @@ local nb = require("nb")
 local glog = nb.glog
 
 --mysql实例
-local mysql =  require("luasql.mysql").mysql():connect("test", "root", "root", "192.168.145.128", 3306)
+--local mysql =  require("luasql.mysql").mysql():connect("test", "root", "root", "192.168.145.128", 3306)
 --切换字符集
-mysql:execute("SET NAMES UTF8")
+--mysql:execute("SET NAMES UTF8")
 
 --执行SELECT语句时返回一条信息
 local function rows (connection, sql_statement)
