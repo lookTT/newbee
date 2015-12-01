@@ -34,29 +34,25 @@ lua:
  
  
 js:
+
     var WebSocket = WebSocket || window.WebSocket || window.MozWebSocket;
     var _wsiSendText = new WebSocket("ws://127.0.0.1:8080", "8080");
     //连接成功
     _wsiSendText.onopen = function (evt) {
         cc.log("_wsiSendText onopen");
     };
-    
     //收到信息
     _wsiSendText.onmessage = function (evt) {
         cc.log("response text msg: " + evt.data);
     };
-
     //连接错误
     _wsiSendText.onerror = function (evt) {
         cc.log("sendText Error was fired");
     };
-
     //连接关闭
     _wsiSendText.onclose = function (evt) {
         cc.log("_wsiSendText websocket instance closed.");
     };
-
-
 
 联系我
 --------------
