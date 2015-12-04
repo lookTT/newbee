@@ -17,7 +17,7 @@
 #define NEWBEE_PORT_HTTP (3501)
 #define NEWBEE_DEAMONIZE (0)
 
-#define NEWBEE_DEFAULT_PID_FILE "/var/run/server.pid"
+#define NEWBEE_DEFAULT_PID_FILE "/var/run/newbee.pid"
 #define NEWBEE_DEFAULT_NULL_FILE "/dev/null"
 #define NEWBEE_DEFAULT_LUA_SCRIPT_FILE "script"
 #define NEWBEE_DEFAULT_LUA_ENTRANCE "main"
