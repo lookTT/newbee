@@ -16,6 +16,7 @@ newbee使用了C++和lua进行开发，希望大家喜欢。
 --------------
 Simple as:
 
+    $ git clone https://github.com/lookTT/newbee.git
     $ sh setup.sh
     $ cd build
     $ make
