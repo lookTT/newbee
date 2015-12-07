@@ -29,7 +29,7 @@ Simple as:
 
 lua:
 
-    websocket = cc.WebSocket:createByAProtocol("127.0.0.1:8080", "abc")
+    websocket = cc.WebSocket:createByAProtocol("127.0.0.1:8000", "abc")
     if nil ~= websocket then
         websocket:registerScriptHandler(websocket_open,cc.WEBSOCKET_OPEN)
         websocket:registerScriptHandler(websocket_message,cc.WEBSOCKET_MESSAGE)
@@ -41,7 +41,7 @@ lua:
 js:
 
     var WebSocket = WebSocket || window.WebSocket || window.MozWebSocket;
-    var _wsiSendText = new WebSocket("ws://127.0.0.1:8080", "abc");
+    var _wsiSendText = new WebSocket("ws://127.0.0.1:8000", "abc");
     //连接成功
     _wsiSendText.onopen = function (evt) {
         cc.log("_wsiSendText onopen");
