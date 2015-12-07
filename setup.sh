@@ -87,14 +87,14 @@ rm -fr libwebsockets-master
 
 echo "Preparing to install redis"
 cd /tmp
-wget http://download.redis.io/releases/redis-3.0.4.tar.gz
-tar zxvf redis-3.0.4.tar.gz
-cd redis-3.0.4
+wget http://download.redis.io/releases/redis-3.0.5.tar.gz
+tar zxvf redis-3.0.5.tar.gz
+cd redis-3.0.5
 make
 make install
 cd /tmp
-rm -fr redis-3.0.4.tar.gz
-rm -fr redis-3.0.4
+rm -fr redis-3.0.5.tar.gz
+rm -fr redis-3.0.5
 
 echo "Setting ldconfig"
 echo /usr/local/lib > /etc/ld.so.conf.d/mylib.conf
