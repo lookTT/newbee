@@ -75,7 +75,7 @@ luarocks install luasql-mysql MYSQL_LIBDIR=/usr/lib64/mysql MYSQL_INCDIR=/usr/in
 
 echo "Preparing to install libwebsockets"
 cd /tmp
-wget https://codeload.github.com/warmcat/libwebsockets/zip/master -O libwebsockets-master.zip
+wget https://github.com/warmcat/libwebsockets/archive/master-test-2015-11-19-1.zip -O libwebsockets-master.zip
 unzip libwebsockets-master.zip
 cd libwebsockets-master
 cmake CMakeLists.txt
