@@ -32,7 +32,7 @@ rm -fr libevent-2.0.22-stable
 
 echo "Preparing to install glog"
 cd /tmp
-wget https://codeload.github.com/google/glog/zip/master -O glog-master.zip
+wget httpshttps://github.com/google/glog/archive/v0.3.4.zip -O glog-master.zip
 unzip glog-master.zip
 cd glog-master
 ./configure
@@ -87,14 +87,14 @@ rm -fr libwebsockets-master
 
 echo "Preparing to install redis"
 cd /tmp
-wget http://download.redis.io/releases/redis-3.0.5.tar.gz
-tar zxvf redis-3.0.5.tar.gz
-cd redis-3.0.5
+wget http://download.redis.io/releases/redis-3.0.6.tar.gz
+tar zxvf redis-3.0.6.tar.gz
+cd redis-3.0.6
 make
 make install
 cd /tmp
-rm -fr redis-3.0.5.tar.gz
-rm -fr redis-3.0.5
+rm -fr redis-3.0.6.tar.gz
+rm -fr redis-3.0.6
 
 echo "Setting ldconfig"
 echo /usr/local/lib > /etc/ld.so.conf.d/mylib.conf
