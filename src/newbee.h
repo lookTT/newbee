@@ -25,15 +25,9 @@ typedef long long int int64;
 #include <fcntl.h>
 #include <assert.h>
 #include <string.h>
-
 #include <sys/stat.h>
 
 #include "glog/logging.h"
-
-extern "C" {
-#include "luajit-2.0/lauxlib.h"
-#include "luajit-2.0/lua.h"
-#include "luajit-2.0/lualib.h"
-}
+#include "luajit-2.0/lua.hpp"
 
 #endif /* NEWBEE_H_ */
